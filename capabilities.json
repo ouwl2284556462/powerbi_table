@@ -1,0 +1,21 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "cols",
+            "name": "cols",
+            "kind": "GroupingOrMeasure"
+        }
+    ],
+    "dataViewMappings": [
+        {
+            "table": {
+                "rows": {
+                    "for": {
+                        "in": "cols"
+                    }
+                }
+            }
+        }
+    ],
+    "privileges": []
+}
