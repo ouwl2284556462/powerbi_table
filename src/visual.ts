@@ -31,19 +31,57 @@ import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructor
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import IVisual = powerbi.extensibility.visual.IVisual;
 import DataView = powerbi.DataView;
+import DataViewTable = powerbi.DataViewTable;
+import DataViewMetadataColumn = powerbi.DataViewMetadataColumn
 import IVisualHost = powerbi.extensibility.IVisualHost;
 import * as d3 from "d3";
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
 
 export class Visual implements IVisual {
-  
+    private table: Selection<HTMLElement>;
+    private tableHeaderRow: Selection<HTMLElement>;
+
+
     constructor(options: VisualConstructorOptions) {
-        
+        this.table = d3.select(options.element)
+        .append('table');
+        this.tableHeaderRow = this.table.append("tr");
     }
 
     public update(options: VisualUpdateOptions) {
-      
+        const dataViews: DataView[] = options.dataViews;    
+        if (!dataViews) {
+            console.log('dataViews is null.');
+            return;
+        }
+
+        const dataView: DataView = dataViews[0];
+        if (!dataView) {
+            console.log('dataView is null.');
+            return;    
+        }
+
+        const dataViewTable: DataViewTable = dataView.table;
+        if (!dataViewTable) {
+            console.log('dataViewTable is null.');
+            return;    
+        }
+
+        this.setTableHeader(dataViewTable);
+    }
+
+    private setTableHeader(dataViewTable: DataViewTable) {
+        const columns: DataViewMetadataColumn[] = dataViewTable.columns;
+        if (!columns || columns.length < 1) {
+            console.log('columns is empty.');
+            return 
+        }
+
+        this.tableHeaderRow.selectAll("th")
+                           .data(columns)
+                           .join("th")
+                           .text(col => col.displayName);
     }
 
 }
