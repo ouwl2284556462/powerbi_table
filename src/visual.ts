@@ -32,24 +32,40 @@ import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import IVisual = powerbi.extensibility.visual.IVisual;
 import DataView = powerbi.DataView;
 import DataViewTable = powerbi.DataViewTable;
-import DataViewMetadataColumn = powerbi.DataViewMetadataColumn
+import IViewport = powerbi.IViewport;
+import DataViewMetadataColumn = powerbi.DataViewMetadataColumn;
+import DataViewTableRow = powerbi.DataViewTableRow;
 import IVisualHost = powerbi.extensibility.IVisualHost;
 import * as d3 from "d3";
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
 
 export class Visual implements IVisual {
-    private table: Selection<HTMLElement>;
     private tableHeaderRow: Selection<HTMLElement>;
+    private tableBody: Selection<HTMLElement>;
+    private tableDiv: Selection<HTMLElement>;
 
 
     constructor(options: VisualConstructorOptions) {
-        this.table = d3.select(options.element)
-        .append('table');
-        this.tableHeaderRow = this.table.append("tr");
+        this.tableDiv = d3.select(options.element)
+        .append("div")
+        .classed("table-wrapper", true);
+
+        const table = this.tableDiv.append('table');
+
+        this.tableHeaderRow = table.append("thead")
+                                    .append("tr");
+
+        this.tableBody = table.append("tbody");
     }
 
     public update(options: VisualUpdateOptions) {
+        const viewport: IViewport = options.viewport;
+        const width: number = viewport.width - 15;
+        const height: number = viewport.height - 10;
+        this.tableDiv.style("width",  width + "px");
+        this.tableDiv.style("height", height + "px");
+
         const dataViews: DataView[] = options.dataViews;    
         if (!dataViews) {
             console.log('dataViews is null.');
@@ -68,7 +84,21 @@ export class Visual implements IVisual {
             return;    
         }
 
+
+
         this.setTableHeader(dataViewTable);
+        this.setTableData(dataViewTable);
+    }
+
+    private setTableData(dataViewTable: DataViewTable) {
+        const dataViewTableRow: DataViewTableRow[] = dataViewTable.rows
+        this.tableBody.selectAll("tr")
+        .data(dataViewTableRow)
+        .join("tr")
+        .selectAll("td")
+        .data(d => d)
+        .join("td")
+        .text(d => d.toString());
     }
 
     private setTableHeader(dataViewTable: DataViewTable) {

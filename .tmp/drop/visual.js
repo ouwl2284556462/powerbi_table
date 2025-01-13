@@ -39,14 +39,24 @@ var owlTable05A3877592064CF1B8CBFB796B3AF282_DEBUG;
 
 
 class Visual {
-    table;
     tableHeaderRow;
+    tableBody;
+    tableDiv;
     constructor(options) {
-        this.table = d3__WEBPACK_IMPORTED_MODULE_0__/* .select */ .Ltv(options.element)
-            .append('table');
-        this.tableHeaderRow = this.table.append("tr");
+        this.tableDiv = d3__WEBPACK_IMPORTED_MODULE_0__/* .select */ .Ltv(options.element)
+            .append("div")
+            .classed("table-wrapper", true);
+        const table = this.tableDiv.append('table');
+        this.tableHeaderRow = table.append("thead")
+            .append("tr");
+        this.tableBody = table.append("tbody");
     }
     update(options) {
+        const viewport = options.viewport;
+        const width = viewport.width - 15;
+        const height = viewport.height - 10;
+        this.tableDiv.style("width", width + "px");
+        this.tableDiv.style("height", height + "px");
         const dataViews = options.dataViews;
         if (!dataViews) {
             console.log('dataViews is null.');
@@ -63,6 +73,17 @@ class Visual {
             return;
         }
         this.setTableHeader(dataViewTable);
+        this.setTableData(dataViewTable);
+    }
+    setTableData(dataViewTable) {
+        const dataViewTableRow = dataViewTable.rows;
+        this.tableBody.selectAll("tr")
+            .data(dataViewTableRow)
+            .join("tr")
+            .selectAll("td")
+            .data(d => d)
+            .join("td")
+            .text(d => d.toString());
     }
     setTableHeader(dataViewTable) {
         const columns = dataViewTable.columns;

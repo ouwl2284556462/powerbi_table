@@ -4,9 +4,11 @@ import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructor
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import IVisual = powerbi.extensibility.visual.IVisual;
 export declare class Visual implements IVisual {
-    private table;
     private tableHeaderRow;
+    private tableBody;
+    private tableDiv;
     constructor(options: VisualConstructorOptions);
     update(options: VisualUpdateOptions): void;
+    private setTableData;
     private setTableHeader;
 }
